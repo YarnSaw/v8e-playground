@@ -32,17 +32,17 @@ async function initializeWebGPU() {
   if (!('gpu' in navigator)) {
     console.log(
         'WebGPU is not supported. Enable chrome://flags/#enable-unsafe-webgpu flag.');
-    return;
+    die();
   }
 
   adapter = await navigator.gpu.requestAdapter();
   if (!adapter) {
     console.log('Failed to get GPU adapter.');
-    return;
+    die();
   }
 
   device = await adapter.requestDevice({requiredFeatures: []});
-  return true;
+  return {adapter, device};
 }
 
 async function initDeviceData(matrix_width) {
@@ -103,7 +103,7 @@ async function initDeviceData(matrix_width) {
   });
 }
 
-async function benchmark(matrix_width) {
+async function benchmark() {
   // Compute shader code
   const shaderModule = device.createShaderModule({
     code: `

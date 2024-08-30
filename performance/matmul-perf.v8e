@@ -6,13 +6,14 @@
  * @date      Aug 2024
  */
 
-const repeatCount = 5;
+const repeatCount = 1;
 
 async function main()
 {
   const testSizes = [500, 1000, 2000, 3000, 4000];
 
-  await initializeWebGPU();
+  const { adapter } = await initializeWebGPU();
+  console.log('GPU found: ', adapter.info.description);
 
   for (let MATRIX_WIDTH of testSizes)
   {
@@ -24,9 +25,9 @@ async function main()
       cleanup();
     }
     let averageTime = timing/repeatCount;
-    console.log(MATRIX_WIDTH, averageTime);
+    console.log(`Matrix of size ${MATRIX_WIDTH} took ${averageTime}ms.`);
   }
   die();
 }
 
-main()
+main();
