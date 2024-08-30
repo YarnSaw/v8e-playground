@@ -1,0 +1,32 @@
+#! /usr/bin/env -S /home/yarn/git/dcp-native/build/artifacts/Release/dcp-evaluator --webgpu -f ../lib/console.js -f ../lib/webgpu-requirements.js -f matmul.js
+/**
+ * @file      webgpu-perf.v8e - Test perf over a variety of matmuls with matrixes of different sizes
+ * 
+ * @author    Ryan Saweczko
+ * @date      Aug 2024
+ */
+
+const repeatCount = 5;
+
+async function main()
+{
+  const testSizes = [500, 1000, 2000, 3000, 4000];
+
+  await initializeWebGPU();
+
+  for (let MATRIX_WIDTH of testSizes)
+  {
+    let timing = 0;
+    for (let trial = 0; trial < repeatCount; trial++)
+    {
+      await initDeviceData(MATRIX_WIDTH);
+      timing += await benchmark(MATRIX_WIDTH);
+      cleanup();
+    }
+    let averageTime = timing/repeatCount;
+    console.log(MATRIX_WIDTH, averageTime);
+  }
+  die();
+}
+
+main()
