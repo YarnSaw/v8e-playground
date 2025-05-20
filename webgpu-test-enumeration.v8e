@@ -1,0 +1,35 @@
+#! /usr/bin/env -S /opt/dcp/bin/dcp-evaluator --webgpu -f lib/console.js -f lib/rt.js -f lib/test.js -f lib/timers.js
+/**
+ * @file      webgpu-events-smoke-test.v8e - tries to add an event listener on device. Known to fail /wg aug 2024
+ * @author    Wes Garland
+ * @date      Aug 2024
+ */
+'use strict';
+
+globalThis.main = async function main()
+{
+  // dcp-native > 7.2.0 lazy loads webgpu
+  if (typeof initWebGPU === 'function')
+    await initWebGPU();
+
+  const gprops = [];
+  const nprops = [];
+
+  for (let prop in navigator)
+    nprops.push(prop);
+  for (let prop in navigator.gpu)
+    gprops.push(prop);
+
+  test('navigator has enumerable gpu prop',       nprops.includes('gpu'));
+  test('navigator.gpu has requestAdapter method', typeof navigator.gpu.requestAdapter, 'function');
+  test('navigator.gpu has enumerable props',      gprops.length > 0);
+  test('enumerable props include requestAdapter', gprops.includes('requestAdapter'));
+
+  const clobber = {};
+  navigator.gpu = clobber;
+  test('navigator.gpu can be clobbered',          navigator.gpu === clobber);
+  test('navigator has gpu on ctor prototype',     navigator.constructor.prototype.hasOwnProperty('gpu'));
+  test('navigator.gpu is an instanceof GPU',      navigator.gpu instanceof GPU);
+
+  console.log('Done.');
+}
